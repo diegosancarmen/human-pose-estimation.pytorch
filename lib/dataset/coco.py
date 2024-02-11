@@ -22,6 +22,8 @@ from pycocotools.cocoeval import COCOeval
 from dataset.JointsDataset import JointsDataset
 from nms.nms import oks_nms
 
+import re # 02/10 for image id line 293 in evaluate
+
 
 logger = logging.getLogger(__name__)
 
@@ -213,7 +215,8 @@ class COCODataset(JointsDataset):
 
     def image_path_from_index(self, index):
         """ example: images / train2017 / 000000119993.jpg """
-        file_name = '%012d.jpg' % index
+        # file_name = '%012d.jpg' % index
+        file_name = f'test{index}.jpg'
         if '2014' in self.image_set:
             file_name = 'COCO_%s_' % self.image_set + file_name
 
@@ -281,13 +284,24 @@ class COCODataset(JointsDataset):
         # person x (keypoints)
         _kpts = []
         for idx, kpt in enumerate(preds):
+
+            try:
+                match = re.search(r'test(\d+)\.jpg', img_path[idx])
+                if match:
+                    number = int(match.group(1))
+            except TypeError as e:
+                print(f"TypeError: {e}")
+                print(f"Image path: {img_path}")
+
             _kpts.append({
                 'keypoints': kpt,
                 'center': all_boxes[idx][0:2],
                 'scale': all_boxes[idx][2:4],
                 'area': all_boxes[idx][4],
                 'score': all_boxes[idx][5],
-                'image': int(img_path[idx][-16:-4])
+                # 'image': int(img_path[idx][-6:-4])
+                'image': int(number)
+
             })
         # image x person x (keypoints)
         kpts = defaultdict(list)
