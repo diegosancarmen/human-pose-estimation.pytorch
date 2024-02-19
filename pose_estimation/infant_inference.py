@@ -230,7 +230,7 @@ def infant_validate(config, val_loader, val_dataset, model, criterion, output_di
                 writer.add_scalars('valid', dict(name_values), global_steps)
             writer_dict['valid_global_steps'] = global_steps + 1
 
-    return perf_indicator
+    # return perf_indicator
 
 def main():
     args = parse_args()
@@ -285,7 +285,7 @@ def main():
         valid_dataset,
         batch_size=config.TEST.BATCH_SIZE*len(gpus),
         shuffle=False,
-        num_workers=config.WORKERS,
+        num_workers=2,
         pin_memory=True
     )
 
